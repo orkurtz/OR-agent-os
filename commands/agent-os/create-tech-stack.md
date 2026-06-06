@@ -6,6 +6,7 @@ Establish the factual tech stack by checking global standards and scanning local
 - **Always use AskUserQuestion tool** when interacting.
 - **Merge context** — Compare global standards against local CLI findings.
 - **Execute OS-appropriate terminal commands** to achieve this goal. Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
+- **Explain Purpose/Usage** — For every technology listed in the final tech stack, write a line or two explaining exactly what we use it for in this specific project.
 
 ## Process
 
@@ -19,7 +20,7 @@ Do NOT rely on a hardcoded list of files. You must dynamically discover the proj
 3. Analyze the raw output to identify the core frameworks, libraries, and database drivers actually installed.
 
 ### Step 3: Present and Confirm
-Synthesize the findings and use AskUserQuestion based on what was found:
+Synthesize the findings and use AskUserQuestion based on what was found, making sure to ask the user to provide or confirm a brief explanation (a line or two) of what each technology is used for in the project.
 
 **Scenario A: Global Standard EXISTS**
 ```
@@ -36,6 +37,8 @@ How should we establish the tech stack for this project?
 3. Different (I'll specify manually)
 
 (Choose 1, 2, or 3)
+
+After choosing, please also specify what we use each of these technologies for in the project (a line or two each).
 ```
 
 **Scenario B: NO Global Standard, but Local CLI data FOUND**
@@ -47,37 +50,36 @@ Backend: [Extracted tech or N/A]
 Database: [Extracted tech or N/A]
 Other: [Extracted tools]
 
-Is this accurate and complete?
-(Respond "yes" or provide corrections/additions)
+Is this accurate and complete? If so, please tell me what we use each of these technologies for in the project (a line or two each), or provide corrections/additions along with their purpose.
 ```
 
 **Scenario C: NO Global Standard AND NO Local Manifests FOUND**
 ```
 I couldn't detect existing global standards or local project manifests.
-What technologies does this project use?
+What technologies does this project use, and what is each used for?
 
 Please describe:
-- Frontend: (e.g., React, Vue, vanilla JS, or N/A)
-- Backend: (e.g., Rails, Node, Django, or N/A)
-- Database: (e.g., PostgreSQL, MongoDB, or N/A)
-- Other: (hosting, APIs, tools, etc.)
+- Frontend: (e.g., React, Vue, vanilla JS, or N/A; and its purpose in the project)
+- Backend: (e.g., Rails, Node, Django, or N/A; and its purpose in the project)
+- Database: (e.g., PostgreSQL, MongoDB, or N/A; and its purpose in the project)
+- Other: (hosting, APIs, tools, etc.; and their purpose in the project)
 ```
 
 ### Step 4: Generate File
-Create `agent-os/product/tech-stack.md` using the selected/provided data:
+Create `agent-os/product/tech-stack.md` using the selected/provided data. For every technology listed in the final tech stack, write a line or two explaining exactly what it is used for in the project:
 
 ```markdown
 # Tech Stack
 
 ## Frontend
-[Data]
+- **[Tech Name]**: [A line or two describing what we use this technology for in the project]
 
 ## Backend
-[Data]
+- **[Tech Name]**: [A line or two describing what we use this technology for in the project]
 
 ## Database
-[Data]
+- **[Tech Name]**: [A line or two describing what we use this technology for in the project]
 
 ## Other
-[Data]
+- **[Tech Name]**: [A line or two describing what we use this technology for in the project]
 ```
