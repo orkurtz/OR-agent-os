@@ -468,8 +468,9 @@ main() {
     print_success "Agent OS installed successfully!"
     echo ""
     echo "Next steps:"
-    echo "  1. Run /discover-standards to extract patterns from your codebase"
-    echo "  2. Run /inject-standards to inject standards into your context"
+    echo "  1. Run /createTechStack to extract the tech stack from your codebase"
+    echo "  2. Run /discover-standards to extract patterns from your codebase"
+    echo "  3. Run /inject-standards to inject standards into your context"
     echo ""
 }
 
