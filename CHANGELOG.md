@@ -5,6 +5,11 @@ https://buildermethods.com/agent-os
 
 ## Unreleased
 
+- Streamlined `plan-product.md` by removing the tech stack establishment phase and implementing a bifurcated lifecycle path (New vs. Existing project) with sequential questioning.
+- Added a new command file `create-tech-stack.md` to dynamically discover project type and technology stack from local manifests and global standards.
+- Hardened `discover-standards.md` to enforce deterministic codebase mapping (`tree`) and a skeleton-first analysis pattern (`grep` skeleton extraction followed by reading ONLY 2-3 specific files).
+- Updated `shape-spec.md` and `plan-product.md` to inject a strict state-tracking checklist system into roadmap and feature plans, including a dynamic local syntax/linting Verification Gate.
+- Injected cross-platform dynamic command translation instructions into discovery phases to maintain OS-agnostic command templates.
 - Fixed silent install failures caused by `((var++))` under `set -e` in `project-install.sh`, `sync-to-profile.sh`, and `common-functions.sh` (#328).
 - Replaced GNU-only `tac` in `project-install.sh` with a POSIX `awk` invocation so installs work on macOS without `coreutils` (#327).
 

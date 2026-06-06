@@ -8,6 +8,8 @@ Works alongside Claude Code, Cursor, Antigravity, and other AI tools. Any langua
 
 **Core capabilities:**
 
+- **Plan Product** — Establish foundational product documentation (mission, roadmap) through an interactive conversation, supporting both new and existing projects
+- **Create Tech Stack** — Dynamically discover local manifests and global standards to establish the project's factual tech stack
 - **Discover Standards** — Extract patterns and conventions from your codebase into documented standards
 - **Deploy Standards** — Intelligently inject relevant standards based on what you're building
 - **Shape Spec** — Create better plans that lead to better builds
