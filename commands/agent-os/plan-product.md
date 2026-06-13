@@ -6,7 +6,8 @@ Establish foundational product documentation through an interactive conversation
 
 - **Always use AskUserQuestion tool** when asking the user anything
 - **Keep it lightweight** — gather enough to create useful docs without over-documenting
-- **One question at a time** — don't overwhelm with multiple questions
+- **One question at a time** — NEVER ask more than one question per message. NEVER proceed to the next question before receiving the user's answer. If the answer is unclear, ask ONE clarifying follow-up before moving on.
+- **State is on disk, not in memory** — Always re-read `roadmap.md` before updating markers. Never assume task status from conversation history.
 
 ## Process
 
@@ -27,18 +28,18 @@ Update the process to branch based on the answer from Step 1. Ensure questions a
 #### Path: NEW Project
 Use AskUserQuestion sequentially, waiting for a response after each question:
 
-1. **What is the idea you want to develop?**
-2. **What problem are you trying to solve?**
-3. **Who is the target audience?**
-4. **How do you intend to solve it?**
+1. **Describe the product you want to build. What is it and what does it do?**
+2. **What specific problem does this solve, and who has this problem?**
+3. **What's your planned approach — key technologies, integrations, or architecture ideas?**
+4. **What does "done" look like for v1? What's the minimum to consider it launched?**
 
 #### Path: EXISTING Project
 Use AskUserQuestion sequentially, waiting for a response after each question:
 
-1. **What upgrade do you want to make / build?**
-2. **Do you have an idea of how to build it?**
-3. **What stage are you at / describe your current situation.**
-4. **Are there things to consider that might affect the implementation?**
+1. **What specific change or upgrade are you making?**
+2. **How do you plan to approach it technically? (libraries, patterns, architecture changes)**
+3. **What is the current state — what works, what is broken, what already exists?**
+4. **What could block this? (dependencies, breaking changes, performance concerns)**
 
 ### Step 3: Gather Roadmap (for roadmap.md)
 
@@ -86,15 +87,22 @@ Generate each file based on the information gathered:
 # Product Roadmap
 
 ## State Tracking & Execution Rules
-CRITICAL: Future agents MUST strictly update this file during execution.
+Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
-- `[/] In Progress` (Must update to this BEFORE writing code)
+- `[/] In Progress` — update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
-**VERIFICATION GATE:** Before changing to `[x]`, you MUST verify the specific files you modified:
-  1. Analyze the extensions of the touched files.
-  2. Dynamically infer and execute the appropriate local syntax/lint check in the terminal. Use OS-appropriate terminal commands. Read local manifests to find the correct project-specific command. Do NOT hallucinate global commands.
-  3. If the terminal outputs compilation or syntax errors, you must remain in `[/]` and fix the code. Mark `[x]` ONLY upon a clean exit code.
-Do NOT rewrite the tasks, only mutate the state markers.
+
+**VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
+  1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
+  2. Run ONLY scripts explicitly defined in that manifest. NEVER invent commands.
+  3. If no lint script exists → run a syntax-only check (e.g., `node --check file.js` or `python -m py_compile file.py`). Use OS-appropriate commands.
+  4. If no manifest exists → skip and note: "No manifest detected — manual review advised."
+  5. Scan output for: "error", "Error", "FAILED", "Cannot find". Exit code 0 with zero errors required. Warnings are acceptable but must be noted.
+  6. If errors exist → remain in `[/]` and fix. Mark `[x]` ONLY upon a clean result.
+
+**RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
+
+Do NOT rewrite task text. Only mutate the state markers.
 
 [Depending on Step 1, generate the appropriate section below]
 
@@ -131,6 +139,10 @@ After creating all files, output to user:
 
 Review these files to ensure they accurately capture your product vision.
 You can edit them directly or run /plan-product again to update.
+
+Next steps:
+- Run /create-tech-stack to document your technology choices
+- Run /shape-spec (in plan mode) when you're ready to plan a feature
 ```
 
 ## Tips

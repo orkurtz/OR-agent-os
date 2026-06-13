@@ -7,6 +7,7 @@ Establish the factual tech stack by checking global standards and scanning local
 - **Merge context** — Compare global standards against local CLI findings.
 - **Execute OS-appropriate terminal commands** to achieve this goal. Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
 - **Explain Purpose/Usage** — For every technology listed in the final tech stack, write a line or two explaining exactly what we use it for in this specific project.
+- **Read ONLY what you need** — Read manifest files only. Do NOT read source code files. Do NOT load directories into context beyond what's needed for discovery.
 
 ## Process
 
@@ -82,4 +83,19 @@ Create `agent-os/product/tech-stack.md` using the selected/provided data. For ev
 
 ## Other
 - **[Tech Name]**: [A line or two describing what we use this technology for in the project]
+```
+
+### Step 5: Confirm Completion
+
+After creating the file, output to user:
+
+```
+✓ Tech stack documented: agent-os/product/tech-stack.md
+
+Review this file to ensure accuracy.
+You can edit it directly or run /create-tech-stack again to update.
+
+Next steps:
+- Run /discover-standards to extract coding conventions from your codebase
+- Run /shape-spec (in plan mode) when ready to plan a feature
 ```

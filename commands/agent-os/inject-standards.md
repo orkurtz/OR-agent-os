@@ -28,7 +28,7 @@ Directly injects specified standards without suggestions.
 
 ### Step 1: Detect Context Scenario
 
-Before injecting standards, determine which scenario we're in. Read the current conversation and check if we're in plan mode.
+Before injecting standards, determine which scenario we're in. Use this deterministic priority order — do NOT rely on keyword-matching in conversation text.
 
 **Three scenarios:**
 
@@ -36,13 +36,11 @@ Before injecting standards, determine which scenario we're in. Read the current 
 2. **Creating a Skill** — Building a `.claude/skills/` file
 3. **Shaping/Planning** — In plan mode, building a spec, running `/shape-spec`
 
-**Detection logic:**
+**Detection priority order:**
 
-- If currently in plan mode OR conversation clearly mentions "spec", "plan", "shape" → **Shaping/Planning**
-- If conversation clearly mentions creating a skill, editing `.claude/skills/`, or building a reusable procedure → **Creating a Skill**
-- Otherwise → **Ask to confirm** (do not assume)
-
-**If neither skill nor plan is clearly detected**, use AskUserQuestion to confirm:
+1. If the user's request explicitly mentions a skill, `.claude/skills/`, or "add to skill" → **Creating a Skill**
+2. If the agent is currently in plan mode (plan mode tool is active) → **Shaping/Planning**
+3. In all other cases → **Ask the user** using AskUserQuestion:
 
 ```
 I'll inject the relevant standards. How should I format them?
@@ -54,11 +52,11 @@ I'll inject the relevant standards. How should I format them?
 Which scenario? (1, 2, or 3)
 ```
 
-Always ask when uncertain — don't assume conversation by default.
+NEVER assume a scenario from ambiguous conversation content. When in doubt, always ask.
 
 ### Step 2: Read the Index (Auto-Suggest Mode)
 
-Read `agent-os/standards/index.yml` to get the list of available standards and their descriptions.
+Read `agent-os/standards/index.yml` to get the list of available standards and their descriptions. Read ONLY the index file — do NOT pre-load all standards files.
 
 If index.yml doesn't exist or is empty:
 ```

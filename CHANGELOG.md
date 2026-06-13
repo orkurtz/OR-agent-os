@@ -5,6 +5,45 @@ https://buildermethods.com/agent-os
 
 ## Unreleased
 
+### Agent Compliance & Instruction Enforcement
+- Hardened sequential question enforcement across all interactive commands — NEVER ask more than one question per message; NEVER proceed without receiving an answer.
+- Moved state tracking rules out of code-block templates and into preamble guidelines so agents parse them as operational rules, not example text.
+- Replaced single overloaded "CRITICAL" markers with specific `MUST` / `NEVER` directives per rule for higher LLM compliance.
+- Added "State is on disk, not in memory" rule to `plan-product.md` and `shape-spec.md` — agents must always re-read the file, never infer task status from conversation history.
+- Added **POST-TASK CHECKLIST** to `shape-spec.md` plan template — executing agents must output a checklist after each task confirming state update, file list, and Verification Gate result.
+- Added explicit **planner-executor separation** to `shape-spec.md` — the command creates plans ONLY; implementation begins only after user approval and exit from plan mode.
+
+### Verification Gate — Hardened
+- Replaced vague "dynamically infer" Verification Gate with a deterministic manifest-reading decision tree across `plan-product.md` and `shape-spec.md`:
+  1. Read manifest to find the defined lint/check script.
+  2. Run ONLY scripts explicitly defined in the manifest — NEVER invent commands.
+  3. If no lint script → run syntax-only check (`node --check` / `python -m py_compile`).
+  4. If no manifest → skip with a note.
+  5. Scan output for error strings; require exit code 0 with zero errors.
+
+### Recovery Design
+- Added **RECOVERY RULE** to roadmap and plan templates: when a `[/] In Progress` item is found at session start, the agent must re-read previous completed files, verify partial work, and decide to resume or reset.
+
+### Question Design
+- Rewrote `plan-product.md` NEW path questions to eliminate overlap (removed "idea" + "solution" duplication) and add launch-criteria clarity.
+- Rewrote `plan-product.md` EXISTING path questions to replace the yes/no trap ("Do you have an idea?") with an open technical framing, and replace "things to consider?" with a specific risk-category question.
+- Fixed `shape-spec.md` Step 4 (product context) to surface specific mission/roadmap/tech conflicts instead of asking the user if they want alignment.
+
+### Context Discipline
+- Added "Read ONLY what you need" guardrails to `discover-standards.md`, `create-tech-stack.md`, and `inject-standards.md` — limits deep reads to explicitly needed files, prevents context bloat.
+
+### Standards Discovery
+- Added anti-pattern question to `discover-standards.md` Step 3 loop: after the "why" questions, agent must ask "What should developers NEVER do with this pattern?" before drafting the standard.
+
+### Scenario Detection
+- Replaced fragile keyword-matching scenario detection in `inject-standards.md` with a deterministic priority order: explicit skill mention → plan mode active → ask the user. Removed all inference from conversation text.
+
+### Completion Feedback
+- Added Step 5 confirmation message to `create-tech-stack.md` with next-step suggestions.
+- Added next-step suggestions to `plan-product.md` Step 5 completion output.
+- Added plan-mode exit reminder and re-read instruction to `shape-spec.md` Step 9.
+
+### Previous Changes
 - Streamlined `plan-product.md` by removing the tech stack establishment phase and implementing a bifurcated lifecycle path (New vs. Existing project) with sequential questioning.
 - Added a new command file `create-tech-stack.md` to dynamically discover project type and technology stack from local manifests and global standards.
 - Hardened `discover-standards.md` to enforce deterministic codebase mapping (`tree`) and a skeleton-first analysis pattern (`grep` skeleton extraction followed by reading ONLY 2-3 specific files).

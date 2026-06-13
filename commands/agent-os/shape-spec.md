@@ -7,6 +7,9 @@ Gather context and structure planning for significant work. **Run this command w
 - **Always use AskUserQuestion tool** when asking the user anything
 - **Offer suggestions** — Present options the user can confirm, adjust, or correct
 - **Keep it lightweight** — This is shaping, not exhaustive documentation
+- **This command ONLY creates the plan. It does NOT implement anything.** Implementation begins only after the user approves the plan and exits plan mode.
+- **One question at a time** — NEVER ask more than one question per message. NEVER proceed before receiving the user's answer.
+- **State is on disk, not in memory** — The executing agent must always re-read `plan.md` before updating markers. Never assume task status from conversation history.
 - **Enforce strict state tracking** — Ensure all plans (`plan.md`) contain a strict State Tracking rules block. Explicitly instruct the executing agent that they must update task markers to `[/] In Progress` before starting work, and `[x] Completed: [comma-separated modified files]` immediately upon completion. Do NOT let them rewrite tasks, only mutate state markers.
 
 ## Prerequisites
@@ -77,15 +80,15 @@ If references are provided, read and analyze them to inform the plan.
 
 Check if `agent-os/product/` exists and contains files.
 
-If it exists, read key files (like `mission.md`, `roadmap.md`, `tech-stack.md`) and use AskUserQuestion:
+If it exists, read key files (like `mission.md`, `roadmap.md`, `tech-stack.md`) and surface SPECIFIC alignment points or conflicts — don't just ask if alignment is needed. Use AskUserQuestion:
 
 ```
-I found product context in agent-os/product/. Should this feature align with any specific product goals or constraints?
+I found product context in agent-os/product/:
+- Mission targets: [summarize the mission focus in 1 line]
+- Roadmap includes: [list any roadmap items that relate to this feature]
+- Tech stack: [note any tech constraints relevant to this feature]
 
-Key points from your product docs:
-- [summarize relevant points]
-
-(Confirm alignment or note any adjustments)
+Does this feature affect or conflict with any of these? (yes — describe / no / not sure)
 ```
 
 If no product folder exists, skip this step.
@@ -137,15 +140,27 @@ Here's the plan structure. Task 1 saves all our shaping work before implementati
 # Plan: [Feature Name]
 
 ## State Tracking & Execution Rules
-CRITICAL: Future agents MUST strictly update this file during execution.
+Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
-- `[/] In Progress` (Must update to this BEFORE writing code)
+- `[/] In Progress` — update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
-**VERIFICATION GATE:** Before changing to `[x]`, you MUST verify the specific files you modified:
-  1. Analyze the extensions of the touched files.
-  2. Dynamically infer and execute the appropriate local syntax/lint check in the terminal. Use OS-appropriate terminal commands. Read local manifests to find the correct project-specific command. Do NOT hallucinate global commands.
-  3. If the terminal outputs compilation or syntax errors, you must remain in `[/]` and fix the code. Mark `[x]` ONLY upon a clean exit code.
-Do NOT rewrite the tasks, only mutate the state markers.
+
+**VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
+  1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
+  2. Run ONLY scripts explicitly defined in that manifest. NEVER invent commands.
+  3. If no lint script exists → run a syntax-only check (e.g., `node --check file.js` or `python -m py_compile file.py`). Use OS-appropriate commands.
+  4. If no manifest exists → skip and note: "No manifest detected — manual review advised."
+  5. Scan output for: "error", "Error", "FAILED", "Cannot find". Exit code 0 with zero errors required. Warnings are acceptable but must be noted.
+  6. If errors exist → remain in `[/]` and fix. Mark `[x]` ONLY upon a clean result.
+
+**RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
+
+**POST-TASK CHECKLIST:** After completing each task, output:
+- [ ] Updated plan.md state marker to `[x]`
+- [ ] Listed all modified files in the `[x]` entry
+- [ ] Ran Verification Gate — result: [clean / warnings noted / errors fixed]
+
+Do NOT rewrite task text. Only mutate the state markers.
 
 ## Task 1: Save Spec Documentation
 
@@ -188,6 +203,11 @@ Plan complete. When you approve and execute:
 
 1. Task 1 will save all spec documentation first
 2. Then implementation tasks will proceed
+
+IMPORTANT: This plan was created in plan mode. To implement it:
+- Exit plan mode
+- Approve this plan
+- The executing agent must re-read plan.md before starting — never assume task status from this conversation
 
 Ready to start? (approve / adjust)
 ```

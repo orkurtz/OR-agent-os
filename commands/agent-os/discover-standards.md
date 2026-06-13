@@ -8,6 +8,7 @@ Extract tribal knowledge from your codebase into concise, documented standards.
 - **Write concise standards** — Use minimal words. Standards must be scannable by AI agents without bloating context windows.
 - **Offer suggestions** — Present options the user can confirm, choose between, or correct. Don't make them think harder than necessary.
 - **Execute OS-appropriate commands** — Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
+- **Read ONLY what you need** — Limit deep reads to 2-3 files per area. Do NOT load entire directories. Do NOT re-read files already in context.
 
 ## Process
 
@@ -76,15 +77,15 @@ Wait for user selection before proceeding.
 
 1. **Ask 1-2 clarifying questions** about the "why" behind the pattern. Use your AskUserQuestion tool for this.
 2. **Wait for user response**
-3. **Draft the standard** incorporating their answer
-4. **Confirm with user** before creating the file
-5. **Create the file** if approved
+3. **Ask the anti-pattern question:** "Are there common mistakes or anti-patterns developers (or AI agents) make with this? What should they NEVER do here?" Wait for response.
+4. **Draft the standard** incorporating both the "why" and the "what NOT to do"
+5. **Confirm with user** before creating the file
+6. **Create the file** if approved
 
-Example questions to ask (adapt based on the specific standard):
+Example clarifying questions to ask (adapt based on the specific standard):
 
 - "What problem does this pattern solve? Why not use the default/common approach?"
 - "Are there exceptions where this pattern shouldn't be used?"
-- "What's the most common mistake a developer or agent makes with this?"
 
 **Do NOT batch all questions upfront.** Process one standard at a time through the full loop.
 
@@ -222,7 +223,15 @@ For the Response Envelope pattern:
 
 User: "We use it so the frontend always knows where to find the data. All endpoints use it, no exceptions."
 
-**3. Draft first standard (Step 3 continued):**
+**3. Ask anti-pattern question (Step 3 continued):**
+```
+Are there common mistakes or anti-patterns developers (or AI agents) make with this?
+What should they NEVER do here?
+```
+
+User: "Never return raw arrays or unwrapped objects. Never omit the 'success' key even on success."
+
+**4. Draft first standard (Step 3 continued):**
 ```
 Here's the draft for api/response-envelope.md:
 
@@ -237,6 +246,10 @@ All API responses use this structure:
 
 - Frontend always checks `success` first, then reads `data` or `error`
 - No exceptions — every endpoint uses this format
+
+**Anti-patterns — NEVER do this:**
+- Do NOT return raw arrays or unwrapped objects
+- Do NOT omit the `success` key even on successful responses
 ---
 
 Create this file?
@@ -244,11 +257,11 @@ Create this file?
 
 User: "Yes"
 
-**4. Create file, then move to next standard:**
+**5. Create file, then move to next standard:**
 
 [Create the file]
 
-**5. Ask why for second standard (back to Step 3):**
+**6. Ask why for second standard (back to Step 3):**
 ```
 For the Error Codes pattern:
 - What's the naming convention for codes?
@@ -257,8 +270,8 @@ For the Error Codes pattern:
 
 User: "Format is AREA_NUMBER like AUTH_001. We keep a list in the wiki."
 
-**6. Draft second standard, confirm, create file...**
+**7. Ask anti-pattern question, draft, confirm, create file...**
 
 [Continue until all selected standards are done]
 
-**Key point:** Complete the full ask → draft → confirm → create cycle for each standard before starting the next one.
+**Key point:** Complete the full ask → anti-pattern → draft → confirm → create cycle for each standard before starting the next one.
