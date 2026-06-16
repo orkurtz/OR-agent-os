@@ -10,7 +10,7 @@ Gather context and structure planning for significant work. **Run this command w
 - **This command ONLY creates the plan. It does NOT implement anything.** Implementation begins only after the user approves the plan and exits plan mode.
 - **One question at a time** — NEVER ask more than one question per message. NEVER proceed before receiving the user's answer.
 - **State is on disk, not in memory** — The executing agent must always re-read `plan.md` before updating markers. Never assume task status from conversation history.
-- **Enforce strict state tracking** — Ensure all plans (`plan.md`) contain a strict State Tracking rules block. Explicitly instruct the executing agent that they must update task markers to `[/] In Progress` before starting work, and `[x] Completed: [comma-separated modified files]` immediately upon completion. Do NOT let them rewrite tasks, only mutate state markers.
+- **Enforce strict state tracking & Ponytail YAGNI** — Ensure all plans (`plan.md`) contain a strict State Tracking rules block. Explicitly instruct the executing agent that they must update task markers to `[/] In Progress` before starting work, and `[x] Completed: [comma-separated modified files]` immediately upon completion. Enforce the Ponytail Rule (YAGNI & Minimization) to keep code changes simple, minimal, and clean. Do NOT let them rewrite tasks, only mutate state markers.
 
 ## Prerequisites
 
@@ -144,6 +144,13 @@ Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
 - `[/] In Progress` — update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
+
+**PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, you MUST run through the Ponytail checklist:
+  1. Is this feature/code absolutely necessary? (YAGNI)
+  2. Does the standard library or native platform features already solve this?
+  3. Can we reuse an existing utility, helper, or package in the codebase instead of writing new code?
+  4. Can the solution be simplified or written in fewer lines?
+  *Goal:* Act like the "laziest senior developer." Do not write code you don't need. Keep it simple, minimal, and clean.
 
 **VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
   1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
