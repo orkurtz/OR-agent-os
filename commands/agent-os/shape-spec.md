@@ -102,11 +102,11 @@ Use AskUserQuestion to confirm:
 ```
 Based on what we're building, these standards may apply:
 
-1. **api/response-format** — API response envelope structure
-2. **api/error-handling** — Error codes and exception handling
-3. **database/migrations** — Migration patterns
+[List ONLY standards actually found in index.yml that are relevant to this feature.
+Format each as: N. **folder/name** — [description from index.yml]
+If no standards in the index are relevant, say so and skip this step.]
 
-Should I include these in the spec? (yes / adjust: remove 3, add frontend/forms)
+Should I include these in the spec? (yes / adjust: remove N, add folder/name)
 ```
 
 Read the confirmed standards files to include their content in the plan context.
@@ -139,18 +139,28 @@ Here's the plan structure. Task 1 saves all our shaping work before implementati
 
 # Plan: [Feature Name]
 
+## ⚡ Session Start Protocol (Read This First)
+Before doing ANY work in this session:
+1. Read `standards.md` in this spec folder — all rules there are mandatory for every task
+2. Scan this file for any `[/] In Progress` tasks → apply RECOVERY RULE below
+3. Do NOT begin any implementation until steps 1–2 are complete
+
 ## State Tracking & Execution Rules
 Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
 - `[/] In Progress` — update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
 
-**PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, you MUST run through the Ponytail checklist:
-  1. Is this feature/code absolutely necessary? (YAGNI)
-  2. Does the standard library or native platform features already solve this?
-  3. Can we reuse an existing utility, helper, or package in the codebase instead of writing new code?
-  4. Can the solution be simplified or written in fewer lines?
-  *Goal:* Act like the "laziest senior developer." Do not write code you don't need. Keep it simple, minimal, and clean.
+**PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, stop at the first rung that holds:
+  1. Does this need to exist at all? Speculative need = skip it. (YAGNI)
+  2. Does the standard library already do this? Use it.
+  3. Does a native platform feature cover it? (`<input type="date">` over a picker lib, CSS over JS, DB constraint over app code.) Use it.
+  4. Does an already-installed dependency solve it? Use it. Never add a new one for what a few lines can do.
+  5. Can it be one line? Make it one line.
+  6. Only then: write the minimum code that works.
+  Mark deliberate simplifications with a `ponytail:` comment — if the shortcut has a known ceiling, name it and the upgrade path.
+  NEVER simplify away: input validation, error handling that prevents data loss, security, or accessibility.
+  Output: code first, then at most three short lines on what was skipped and when to add it.
 
 **VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
   1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
@@ -162,22 +172,24 @@ Future agents MUST strictly update this file during execution.
 
 **RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
 
-**POST-TASK CHECKLIST:** After completing each task, output:
-- [ ] Updated plan.md state marker to `[x]`
-- [ ] Listed all modified files in the `[x]` entry
-- [ ] Ran Verification Gate — result: [clean / warnings noted / errors fixed]
+**POST-TASK MANDATE:** After completing each task, you MUST:
+1. Use a file-edit tool to write the updated marker directly into `plan.md` on disk.
+   - First re-read `plan.md` to get current content — never rely on conversation memory.
+   - Change `[/] In Progress` → `[x] Completed: [comma-separated modified files]`
+2. Record the Verification Gate result inline in the `[x]` entry.
 
+Never mark a task complete only in conversation — the mutation MUST be written to disk.
 Do NOT rewrite task text. Only mutate the state markers.
 
 ## Task 1: Save Spec Documentation
 
 Create `agent-os/specs/{folder-name}/` with:
 
-- **plan.md** — This full plan
-- **shape.md** — Shaping notes (scope, decisions, context from our conversation)
-- **standards.md** — Relevant standards that apply to this work
-- **references.md** — Pointers to reference implementations studied
-- **visuals/** — Any mockups or screenshots provided
+- [ ] **plan.md** — This full plan
+- [ ] **shape.md** — Shaping notes (scope, decisions, context from our conversation)
+- [ ] **standards.md** — Relevant standards that apply to this work
+- [ ] **references.md** — Pointers to reference implementations studied
+- [ ] **visuals/** — Any mockups or screenshots provided (skip if none)
 
 ## Task 2: [First implementation task]
 

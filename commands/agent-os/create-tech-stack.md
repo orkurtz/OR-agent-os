@@ -11,8 +11,8 @@ Establish the factual tech stack by checking global standards and scanning local
 
 ## Process
 
-### Step 1: Check Global Standards
-Check if `agent-os/standards/global/tech-stack.md` exists. If it does, read it to extract the baseline technologies.
+### Step 1: Check Existing Tech Stack
+Check if `agent-os/product/tech-stack.md` already exists (from a previous run). If it does, read it to show the user what is currently documented and use it as the baseline for comparison.
 
 ### Step 2: Deterministic Local Discovery
 Do NOT rely on a hardcoded list of files. You must dynamically discover the project type.

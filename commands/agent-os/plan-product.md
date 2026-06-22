@@ -86,11 +86,25 @@ Generate each file based on the information gathered:
 ```markdown
 # Product Roadmap
 
+## ⚡ Session Start Protocol (Read This First)
+Before doing ANY work in this session:
+1. Scan this file for any `[/] In Progress` tasks → apply RECOVERY RULE below
+2. Do NOT begin any implementation until step 1 is complete
+
 ## State Tracking & Execution Rules
 Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
 - `[/] In Progress` — update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
+
+**PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, stop at the first rung that holds:
+  1. Does this need to exist at all? Speculative need = skip it. (YAGNI)
+  2. Does the standard library already do this? Use it.
+  3. Does a native platform feature cover it? Use it.
+  4. Does an already-installed dependency solve it? Use it. Never add a new one for what a few lines can do.
+  5. Can it be one line? Make it one line.
+  6. Only then: write the minimum code that works.
+  NEVER simplify away: input validation, error handling that prevents data loss, security, or accessibility.
 
 **VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
   1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
@@ -102,11 +116,20 @@ Future agents MUST strictly update this file during execution.
 
 **RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
 
+**POST-TASK MANDATE:** After completing each task, you MUST:
+1. Use a file-edit tool to write the updated marker directly into `roadmap.md` on disk.
+   - First re-read `roadmap.md` to get current content — never rely on conversation memory.
+   - Change `[/] In Progress` → `[x] Completed: [comma-separated modified files]`
+2. Record the Verification Gate result inline in the `[x]` entry.
+
+Never mark a task complete only in conversation — the mutation MUST be written to disk.
 Do NOT rewrite task text. Only mutate the state markers.
 
-[Depending on Step 1, generate the appropriate section below]
+⚠️ GENERATE ONLY ONE of the two sections below based on the lifecycle answer from Step 1.
+Write only the matching section into roadmap.md. Delete the other section AND this instruction entirely from the generated file.
 
-### For NEW Projects:
+--- IF NEW PROJECT ---
+
 ## Phase 1: MVP
 
 - [ ] [Insert must-have features for launch - from Step 3]
@@ -115,7 +138,8 @@ Do NOT rewrite task text. Only mutate the state markers.
 
 - [ ] [Insert planned future features - from Step 3, or "To be determined" if they said none yet]
 
-### For EXISTING Projects:
+--- IF EXISTING PROJECT ---
+
 ## Current State
 
 - [ ] [Insert current stage / situation description from Step 2]
