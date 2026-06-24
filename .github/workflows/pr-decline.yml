@@ -87,7 +87,7 @@ jobs:
             switch (reason) {
               case "Out of scope":
                 body =
-                  "Thanks for the PR! After review, this change isn’t on the current roadmap for Agent OS. " +
+                  "Thanks for the PR! After review, this change isn't on the current roadmap for Agent OS. " +
                   "We keep core focused to manage long-term maintenance and compatibility.\n\n" +
                   `If you'd like to continue the conversation, please start a proposal in **Ideas**: ${IDEAS}\n` +
                   "If you publish a fork/plugin/example, feel free to share it in **Show & Tell** so others can try it.\n\n" +
@@ -96,11 +96,11 @@ jobs:
 
               case "Low info":
                 body =
-                  "Thanks for the PR! We’re missing required details for review.\n\n" +
+                  "Thanks for the PR! We're missing required details for review.\n\n" +
                   "Please update the PR with:\n" +
-                  "• **Summary**\n" +
-                  "• **Checklist**\n" +
-                  "• **Documented steps to test**\n\n" +
+                  "- **Summary**\n" +
+                  "- **Checklist**\n" +
+                  "- **Documented steps to test**\n\n" +
                   `Guidelines: ${CONTRIB}\n\n` +
                   "Once updated, you can open a new PR or ask a maintainer to reopen.";
                 break;
@@ -108,12 +108,12 @@ jobs:
               case "Duplicate":
                 body =
                   "Thanks for the PR! This appears to duplicate existing work or discussion. " +
-                  "We’ll consolidate on the canonical thread/PR to reduce churn.\n\n" +
+                  "We'll consolidate on the canonical thread/PR to reduce churn.\n\n" +
                   "_Closing this one to keep things tidy._";
                 break;
 
               case "Spam":
-                body = "Closing this PR. It doesn’t meet our contribution policy.";
+                body = "Closing this PR. It doesn't meet our contribution policy.";
                 break;
 
               default:

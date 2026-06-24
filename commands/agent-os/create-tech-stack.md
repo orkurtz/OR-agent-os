@@ -3,7 +3,7 @@
 Establish the factual tech stack by checking global standards and scanning local project manifests before engaging the user.
 
 ## Important Guidelines
-- **Always use AskUserQuestion tool** when interacting.
+- **Use the available user-input/question tool** when one exists. If none exists, ask one concise question in chat.
 - **Merge context** — Compare global standards against local CLI findings.
 - **Execute OS-appropriate terminal commands** to achieve this goal. Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
 - **Explain Purpose/Usage** — For every technology listed in the final tech stack, write a line or two explaining exactly what we use it for in this specific project.
@@ -16,12 +16,12 @@ Check if `agent-os/product/tech-stack.md` already exists (from a previous run). 
 
 ### Step 2: Deterministic Local Discovery
 Do NOT rely on a hardcoded list of files. You must dynamically discover the project type.
-1. Execute OS-appropriate terminal commands (translating Unix concepts like `ls -la` or `tree -L 2`) in the project root to identify which dependency manifest files exist (e.g., `package.json`, `Cargo.toml`, `pom.xml`, `requirements.txt`, `composer.json`, `build.gradle`, `.csproj`, `go.mod`, etc.).
+1. Execute OS-appropriate terminal commands (translating Unix concepts like `ls -la` or `tree -L 2`) in the project root to identify which dependency manifest files exist (e.g., `package.json`, `pyproject.toml`, `requirements.txt`, `Cargo.toml`, `go.mod`, `.csproj`, `composer.json`, `pom.xml`, `build.gradle`, etc.).
 2. Execute OS-appropriate terminal commands (translating concepts like `cat` or `grep`) to read ONLY the identified dependency manifest files. Do NOT read source code.
 3. Analyze the raw output to identify the core frameworks, libraries, and database drivers actually installed.
 
 ### Step 3: Present and Confirm
-Synthesize the findings and use AskUserQuestion based on what was found, making sure to ask the user to provide or confirm a brief explanation (a line or two) of what each technology is used for in the project.
+Synthesize the findings and ask the user only to confirm each technology's project-specific purpose and add non-manifest technologies such as hosting, external APIs, queues, analytics, auth providers, payments, or deployment platforms.
 
 **Scenario A: Global Standard EXISTS**
 ```

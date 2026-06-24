@@ -4,16 +4,29 @@ Establish foundational product documentation through an interactive conversation
 
 ## Important Guidelines
 
-- **Always use AskUserQuestion tool** when asking the user anything
+- **Use the available user-input/question tool** when one exists. If none exists, ask one concise question in chat.
 - **Keep it lightweight** — gather enough to create useful docs without over-documenting
 - **One question at a time** — NEVER ask more than one question per message. NEVER proceed to the next question before receiving the user's answer. If the answer is unclear, ask ONE clarifying follow-up before moving on.
-- **State is on disk, not in memory** — Always re-read `roadmap.md` before updating markers. Never assume task status from conversation history.
+- **Product docs are context, not execution logs** — Do not add task-state machinery to high-level product roadmaps unless the user explicitly wants the roadmap used as an execution checklist.
 
 ## Process
 
-### Step 1: Determine Lifecycle State
+### Step 1: Check Existing Context
 
-Use AskUserQuestion:
+Before asking questions, inspect whether these files exist:
+
+- `README*`
+- `docs/`
+- `agent-os/product/project-brief.md`
+- `agent-os/product/mission.md`
+- `agent-os/product/roadmap.md`
+- `agent-os/product/tech-stack.md`
+
+If relevant docs exist, summarize what they already say and ask whether to use them as source context, update existing Agent OS product docs, or replace the product docs.
+
+### Step 2: Determine Lifecycle State
+
+Use the available question tool or chat:
 
 ```
 Is this a brand new project or an existing project? (Choose: New / Existing)
@@ -21,43 +34,45 @@ Is this a brand new project or an existing project? (Choose: New / Existing)
 
 **Mandate waiting for the user's response before proceeding.**
 
-### Step 2: Gather Product Vision (for mission.md)
+### Step 3: Gather Product Vision (for mission.md)
 
-Update the process to branch based on the answer from Step 1. Ensure questions are asked sequentially, waiting for an answer after each.
-
-#### Path: NEW Project
-Use AskUserQuestion sequentially, waiting for a response after each question:
-
-1. **Describe the product you want to build. What is it and what does it do?**
-2. **What specific problem does this solve, and who has this problem?**
-3. **What's your planned approach — key technologies, integrations, or architecture ideas?**
-4. **What does "done" look like for v1? What's the minimum to consider it launched?**
-
-#### Path: EXISTING Project
-Use AskUserQuestion sequentially, waiting for a response after each question:
-
-1. **What specific change or upgrade are you making?**
-2. **How do you plan to approach it technically? (libraries, patterns, architecture changes)**
-3. **What is the current state — what works, what is broken, what already exists?**
-4. **What could block this? (dependencies, breaking changes, performance concerns)**
-
-### Step 3: Gather Roadmap (for roadmap.md)
-
-Update the process to branch based on the answer from Step 1. Ask sequentially, waiting for an answer after each.
+Update the process to branch based on the answer from Step 2. Ensure questions are asked sequentially, waiting for an answer after each.
 
 #### Path: NEW Project
-Use AskUserQuestion sequentially, waiting for a response after each question:
+Ask sequentially, waiting for a response after each question:
 
-1. **What are the must-have features for launch (MVP)?**
-2. **What features are planned for post-launch?**
+1. **What product are you building? What should it do in plain language?**
+2. **Who is the target user, and what problem are we solving for them?**
+3. **What is the smallest useful v1 that would be worth launching?**
+4. **What constraints are non-negotiable? (technical, business, compliance, UX, budget, timeline)**
+5. **What should be intentionally deferred until after v1?**
 
 #### Path: EXISTING Project
-Use AskUserQuestion sequentially, waiting for a response after each question:
+Ask sequentially, waiting for a response after each question:
 
-1. **What are the major features or architectural changes required for this new phase?**
-2. **What are the exact technical or business acceptance criteria for this new phase to be considered "Complete"?**
+1. **What does this project currently do, in plain language?**
+2. **What phase, change, or upgrade are you planning now?**
+3. **What already works and should be preserved?**
+4. **What is risky, constrained, broken, or sensitive?**
+5. **What does "done" mean for this phase?**
 
-### Step 4: Generate Files
+### Step 4: Gather Roadmap (for roadmap.md)
+
+Update the process to branch based on the answer from Step 2. Ask sequentially, waiting for an answer after each.
+
+#### Path: NEW Project
+Ask sequentially, waiting for a response after each question:
+
+1. **Which v1 outcomes or features are required for launch?**
+2. **Which features are explicitly post-launch or "not yet"?**
+
+#### Path: EXISTING Project
+Ask sequentially, waiting for a response after each question:
+
+1. **What major features, fixes, or architecture changes are required for this phase?**
+2. **What acceptance criteria prove this phase is complete?**
+
+### Step 5: Generate Files
 
 Create the `agent-os/product/` directory if it doesn't exist.
 
@@ -70,15 +85,19 @@ Generate each file based on the information gathered:
 
 ## Background & Problem
 
-[Insert background, problem, or current situation from Step 2]
+[Insert background, problem, or current situation from the answers above]
 
 ## Scope / Audience
 
-[Insert target audience or scope of upgrade from Step 2]
+[Insert target audience or scope of upgrade from the answers above]
 
 ## Solution & Constraints
 
-[Insert solution description and any constraints/considerations from Step 2]
+[Insert solution description and any constraints/considerations from the answers above]
+
+## Related Context
+
+[Reference `project-brief.md` or `tech-stack.md` if present, otherwise "No existing Agent OS project context found."]
 ```
 
 #### roadmap.md
@@ -86,77 +105,38 @@ Generate each file based on the information gathered:
 ```markdown
 # Product Roadmap
 
-## ⚡ Session Start Protocol (Read This First)
-Before doing ANY work in this session:
-1. Scan this file for any `[/] In Progress` tasks → apply RECOVERY RULE below
-2. Do NOT begin any implementation until step 1 is complete
-
-## State Tracking & Execution Rules
-Future agents MUST strictly update this file during execution.
-- `[ ]` Pending
-- `[/] In Progress` — update to this BEFORE writing any code
-- `[x] Completed: [comma-separated modified files]`
-
-**PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, stop at the first rung that holds:
-  1. Does this need to exist at all? Speculative need = skip it. (YAGNI)
-  2. Does the standard library already do this? Use it.
-  3. Does a native platform feature cover it? Use it.
-  4. Does an already-installed dependency solve it? Use it. Never add a new one for what a few lines can do.
-  5. Can it be one line? Make it one line.
-  6. Only then: write the minimum code that works.
-  NEVER simplify away: input validation, error handling that prevents data loss, security, or accessibility.
-
-**VERIFICATION GATE:** Before changing any task to `[x]`, you MUST:
-  1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
-  2. Run ONLY scripts explicitly defined in that manifest. NEVER invent commands.
-  3. If no lint script exists → run a syntax-only check (e.g., `node --check file.js` or `python -m py_compile file.py`). Use OS-appropriate commands.
-  4. If no manifest exists → skip and note: "No manifest detected — manual review advised."
-  5. Scan output for: "error", "Error", "FAILED", "Cannot find". Exit code 0 with zero errors required. Warnings are acceptable but must be noted.
-  6. If errors exist → remain in `[/]` and fix. Mark `[x]` ONLY upon a clean result.
-
-**RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
-
-**POST-TASK MANDATE:** After completing each task, you MUST:
-1. Use a file-edit tool to write the updated marker directly into `roadmap.md` on disk.
-   - First re-read `roadmap.md` to get current content — never rely on conversation memory.
-   - Change `[/] In Progress` → `[x] Completed: [comma-separated modified files]`
-2. Record the Verification Gate result inline in the `[x]` entry.
-
-Never mark a task complete only in conversation — the mutation MUST be written to disk.
-Do NOT rewrite task text. Only mutate the state markers.
-
-⚠️ GENERATE ONLY ONE of the two sections below based on the lifecycle answer from Step 1.
+⚠️ GENERATE ONLY ONE of the two sections below based on the lifecycle answer from Step 2.
 Write only the matching section into roadmap.md. Delete the other section AND this instruction entirely from the generated file.
 
 --- IF NEW PROJECT ---
 
 ## Phase 1: MVP
 
-- [ ] [Insert must-have features for launch - from Step 3]
+- [ ] [Insert must-have features for launch - from Step 4]
 
 ## Phase 2: Post-Launch
 
-- [ ] [Insert planned future features - from Step 3, or "To be determined" if they said none yet]
+- [ ] [Insert planned future features - from Step 4, or "To be determined" if they said none yet]
 
 --- IF EXISTING PROJECT ---
 
 ## Current State
 
-- [ ] [Insert current stage / situation description from Step 2]
+- [ ] [Insert current stage / situation description from Step 3]
 
 ## New Phase
 
-- [ ] [Insert major feature / architectural change required - from Step 3]
-- [ ] [Insert acceptance criteria - from Step 3]
+- [ ] [Insert major feature / architectural change required - from Step 4]
+- [ ] [Insert acceptance criteria - from Step 4]
 ```
 
 
-### Step 5: Confirm Completion
+### Step 6: Confirm Completion
 
 After creating all files, output to user:
 
 ```
-✓ Product documentation created:
+Product documentation created:
 
   agent-os/product/mission.md
   agent-os/product/roadmap.md
@@ -165,6 +145,7 @@ Review these files to ensure they accurately capture your product vision.
 You can edit them directly or run /plan-product again to update.
 
 Next steps:
+- Run /understand-project if project-brief.md does not exist
 - Run /create-tech-stack to document your technology choices
 - Run /shape-spec (in plan mode) when you're ready to plan a feature
 ```

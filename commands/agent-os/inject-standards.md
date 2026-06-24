@@ -40,7 +40,7 @@ Before injecting standards, determine which scenario we're in. Use this determin
 
 1. If the user's request explicitly mentions a skill, `.claude/skills/`, or "add to skill" → **Creating a Skill**
 2. If the agent is currently in plan mode (plan mode tool is active) → **Shaping/Planning**
-3. In all other cases → **Ask the user** using AskUserQuestion:
+3. In all other cases → **Ask the user** using the available user-input/question tool, or one concise chat question if no such tool exists:
 
 ```
 I'll inject the relevant standards. How should I format them?
@@ -73,7 +73,7 @@ Look at the current conversation to understand what the user is working on:
 
 ### Step 4: Match and Suggest
 
-Match index descriptions against the context. Use AskUserQuestion to present suggestions:
+Match index descriptions against the context. Present suggestions and inject only the standards the user selects:
 
 ```
 Based on your task, these standards may be relevant:
@@ -121,12 +121,12 @@ I've read the following standards as they are relevant to what we're working on:
 
 #### Scenario: Creating a Skill
 
-First, use AskUserQuestion to determine how to include the standards:
+First, ask how to include the standards. Prefer references for living standards unless the user asks for a self-contained snapshot:
 
 ```
 How should these standards be included in your skill?
 
-1. **References** — Add @ file paths that point to the standards (keeps skill lightweight, standards stay in sync)
+1. **References** — Add @ file paths that point to the standards (recommended; keeps skill lightweight, standards stay in sync)
 2. **Copy content** — Paste the full standards content into the skill (self-contained, but won't update if standards change)
 
 Which approach? (1 or 2)
@@ -174,12 +174,12 @@ These standards cover:
 
 #### Scenario: Shaping/Planning
 
-First, use AskUserQuestion to determine how to include the standards:
+First, ask how to include the standards. Prefer references for living standards unless the user asks for a self-contained snapshot:
 
 ```
 How should these standards be included in your plan?
 
-1. **References** — Add @ file paths that point to the standards (keeps plan lightweight, standards stay in sync)
+1. **References** — Add @ file paths that point to the standards (recommended; keeps plan lightweight, standards stay in sync)
 2. **Copy content** — Paste the full standards content into the plan (self-contained, but won't update if standards change)
 
 Which approach? (1 or 2)

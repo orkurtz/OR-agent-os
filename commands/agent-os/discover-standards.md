@@ -4,11 +4,11 @@ Extract tribal knowledge from your codebase into concise, documented standards.
 
 ## Important Guidelines
 
-- **Always use AskUserQuestion tool** when asking the user anything
+- **Use the available user-input/question tool** when one exists. If none exists, ask one concise question in chat.
 - **Write concise standards** — Use minimal words. Standards must be scannable by AI agents without bloating context windows.
 - **Offer suggestions** — Present options the user can confirm, choose between, or correct. Don't make them think harder than necessary.
 - **Execute OS-appropriate commands** — Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
-- **Read ONLY what you need** — Limit deep reads to 2-3 files per area. Do NOT load entire directories. Do NOT re-read files already in context.
+- **Read ONLY what you need** — Limit deep reads to 2-5 files per area. Do NOT load entire directories. Do NOT re-read files already in context.
 
 ## Process
 
@@ -23,7 +23,7 @@ If no area was specified:
    - **Frontend areas:** UI components, styling/CSS, state management, forms, routing
    - **Backend areas:** API routes, database/models, authentication, background jobs
    - **Cross-cutting:** Error handling, validation, testing, naming conventions, file structure
-3. Use AskUserQuestion to present the areas:
+3. Use the available question tool or chat to present the areas:
 
 ```
 I've identified these areas in your codebase:
@@ -44,14 +44,15 @@ Once an area is determined:
 
 1. Perform a two-part analysis of the selected area to extract patterns:
    a) **Skeleton Extraction:** Mandate fast terminal searches (e.g., `grep -r "class\|interface\|extends\|export\|return {" [selected_area] | head -n 50`) to identify macro-patterns. Dynamically translate standard Unix concepts (`grep`, `head`) into native commands of your host operating system.
-   b) **Deep Reading:** Limit yourself to fully reading ONLY 2-3 specific files that clearly represent the patterns found in the grep/skeleton output.
+   b) **Deep Reading:** Limit yourself to fully reading ONLY 2-5 specific files that clearly represent the patterns found in the grep/skeleton output.
 2. Look for patterns that are:
    - **Unusual or unconventional** — Not standard framework/library patterns
    - **Opinionated** — Specific choices that could have gone differently
    - **Tribal** — Things a new developer wouldn't know without being told
    - **Consistent** — Patterns repeated across multiple files
+   - **Not framework defaults** — Avoid documenting behavior that the framework already clearly dictates
 
-3. Use AskUserQuestion to present findings and let user select:
+3. Use the available question tool or chat to present findings and let user select:
 
 ```
 I analyzed [area] and found these potential standards worth documenting:
@@ -71,21 +72,25 @@ Options:
 
 Wait for user selection before proceeding.
 
-### Step 3: Ask Why, Then Draft Each Standard
+### Step 3: Confirm Rule, Then Draft Each Standard
 
 **IMPORTANT:** For each selected standard, you MUST complete this full loop before moving to the next standard:
 
-1. **Ask 1-2 clarifying questions** about the "why" behind the pattern. Use your AskUserQuestion tool for this.
+1. **Confirm it is worth documenting:** "Is this a real project convention, or just a framework/default pattern?"
 2. **Wait for user response**
-3. **Ask the anti-pattern question:** "Are there common mistakes or anti-patterns developers (or AI agents) make with this? What should they NEVER do here?" Wait for response.
-4. **Draft the standard** incorporating both the "why" and the "what NOT to do"
-5. **Confirm with user** before creating the file
-6. **Create the file** if approved
+3. **Ask what agents should always do:** "What should agents always do when this rule applies?"
+4. **Ask what agents should never do:** "What should agents never do here?"
+5. **Ask the exception question:** "When does this rule not apply?"
+6. **Draft the standard** with the rule, why, example, anti-patterns, and exceptions.
+7. **Confirm with user** before creating the file.
+8. **Create the file** if approved.
 
-Example clarifying questions to ask (adapt based on the specific standard):
+Use this compact loop for each selected standard:
 
-- "What problem does this pattern solve? Why not use the default/common approach?"
-- "Are there exceptions where this pattern shouldn't be used?"
+- "Is this a real project convention or just framework default?"
+- "What should agents always do?"
+- "What should agents never do?"
+- "When does this rule not apply?"
 
 **Do NOT batch all questions upfront.** Process one standard at a time through the full loop.
 
@@ -98,7 +103,7 @@ For each standard (after completing Step 3's Q&A):
 
 2. Check if a related standard file already exists — append to it if so
 
-3. Draft the content and use AskUserQuestion to confirm:
+3. Draft the content and use the available question tool or chat to confirm:
 
 ```
 Here's the draft for api/response-format.md:
@@ -113,9 +118,11 @@ All API responses use this envelope:
 { "success": false, "error": { "code": "...", "message": "..." } }
 \`\`\`
 
-- Never return raw data without the envelope
-- Error responses must include both code and message
-- Success responses omit the error field entirely
+- **Rule:** Always return the response envelope.
+- **Why:** Frontend code checks one predictable shape.
+- **Example:** `{ "success": true, "data": { ... } }`
+- **Anti-patterns:** Never return raw arrays or unwrapped objects.
+- **Exceptions:** None unless explicitly documented in this standard.
 ---
 
 Create this file? (yes / edit: [your changes] / skip)
@@ -129,7 +136,7 @@ Create this file? (yes / edit: [your changes] / skip)
 After all standards are created:
 
 1. Scan `agent-os/standards/` for all `.md` files
-2. For each new file without an index entry, use AskUserQuestion:
+2. For each new file without an index entry, use the available question tool or chat:
 
 ```
 New standard needs an index entry:
@@ -152,7 +159,7 @@ Alphabetize by folder, then by filename.
 
 ### Step 6: Offer to Continue
 
-Use AskUserQuestion:
+Use the available question tool or chat:
 
 ```
 Standards created for [area]:
@@ -176,6 +183,7 @@ Standards will be injected into AI context windows. Every word costs tokens. Fol
 - **Skip the obvious** — Don't document what the code already makes clear
 - **One standard per concept** — Don't combine unrelated patterns
 - **Bullet points over paragraphs** — Scannable beats readable
+- **Include the full decision** — Each standard should capture the rule, why it exists, examples, anti-patterns, and when it does not apply.
 
 **Good:**
 ```markdown

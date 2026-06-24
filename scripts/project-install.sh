@@ -22,6 +22,8 @@ source "$SCRIPT_DIR/common-functions.sh"
 VERBOSE="false"
 PROFILE=""
 COMMANDS_ONLY="false"
+DRY_RUN="false"
+NO_STANDARDS_OVERWRITE="false"
 
 # -----------------------------------------------------------------------------
 # Help Function
@@ -36,6 +38,9 @@ Install Agent OS into the current project directory.
 Options:
     --profile <name>     Use specified profile (default: from config.yml)
     --commands-only      Only update commands, preserve existing standards
+    --no-standards-overwrite
+                         Cancel instead of prompting when standards already exist
+    --dry-run            Preview installation without writing files
     --verbose            Show detailed output
     -h, --help           Show this help message
 
@@ -43,6 +48,7 @@ Examples:
     $0
     $0 --profile rails
     $0 --commands-only
+    $0 --dry-run
 
 EOF
     exit 0
@@ -61,6 +67,14 @@ parse_arguments() {
                 ;;
             --commands-only)
                 COMMANDS_ONLY="true"
+                shift
+                ;;
+            --no-standards-overwrite)
+                NO_STANDARDS_OVERWRITE="true"
+                shift
+                ;;
+            --dry-run)
+                DRY_RUN="true"
                 shift
                 ;;
             --verbose)
@@ -172,8 +186,18 @@ confirm_standards_overwrite() {
         echo ""
         print_warning "Existing standards folder detected at: $existing_standards"
         echo ""
-        echo "This will overwrite your existing standards with standards from the '$EFFECTIVE_PROFILE' profile."
+        echo "This will back up your existing standards, then install standards from the '$EFFECTIVE_PROFILE' profile."
         echo ""
+
+        if [[ "$NO_STANDARDS_OVERWRITE" == "true" ]]; then
+            print_error "Cancelled because --no-standards-overwrite was specified."
+            echo ""
+            echo "To update only commands without touching standards, use:"
+            echo "  $0 --commands-only"
+            echo ""
+            exit 1
+        fi
+
         read -p "Do you want to continue? (y/N) " -n 1 -r
         echo ""
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -188,6 +212,91 @@ confirm_standards_overwrite() {
     fi
 }
 
+backup_existing_standards() {
+    if [[ "$COMMANDS_ONLY" == "true" ]]; then
+        return
+    fi
+
+    local existing_standards="$PROJECT_DIR/agent-os/standards"
+    if [[ ! -d "$existing_standards" ]]; then
+        return
+    fi
+
+    local timestamp=$(date +"%Y-%m-%d-%H%M")
+    local backup_dir="$existing_standards/.backups/$timestamp"
+
+    ensure_dir "$backup_dir"
+
+    local count=0
+    while IFS= read -r -d '' file; do
+        local relative_path="${file#$existing_standards/}"
+        local backup_file="$backup_dir/$relative_path"
+        ensure_dir "$(dirname "$backup_file")"
+        cp "$file" "$backup_file"
+        (( count++ )) || true
+    done < <(find "$existing_standards" -name "*.md" -type f ! -path "*/.backups/*" -print0 2>/dev/null)
+
+    if [[ "$count" -gt 0 ]]; then
+        print_success "Backed up $count existing standards to agent-os/standards/.backups/$timestamp/"
+    fi
+}
+
+dry_run_installation() {
+    print_section "Agent OS Project Installation (dry run)"
+
+    echo "Project directory: $PROJECT_DIR"
+    echo "Profile: $EFFECTIVE_PROFILE"
+    echo "Commands only: $COMMANDS_ONLY"
+    echo "No standards overwrite: $NO_STANDARDS_OVERWRITE"
+    echo ""
+
+    echo "Profile inheritance chain:"
+    while IFS= read -r profile_name; do
+        [[ -z "$profile_name" ]] && continue
+        echo "  - $profile_name"
+    done <<< "$INHERITANCE_CHAIN"
+
+    echo ""
+    echo "Standards that would be installed:"
+    if [[ "$COMMANDS_ONLY" == "true" ]]; then
+        echo "  (skipped because --commands-only was set)"
+    else
+        local found=0
+        while IFS= read -r profile_name; do
+            [[ -z "$profile_name" ]] && continue
+            local profile_standards="$BASE_DIR/profiles/$profile_name/standards"
+            if [[ ! -d "$profile_standards" ]]; then
+                continue
+            fi
+            while IFS= read -r -d '' file; do
+                local relative_path="${file#$profile_standards/}"
+                echo "  $relative_path (from $profile_name)"
+                found=1
+            done < <(find "$profile_standards" -name "*.md" -type f ! -path "*/.backups/*" -print0 2>/dev/null | sort -z)
+        done <<< "$INHERITANCE_CHAIN"
+        if [[ "$found" -eq 0 ]]; then
+            echo "  (none)"
+        fi
+    fi
+
+    echo ""
+    echo "Commands that would be installed to .claude/commands/agent-os/:"
+    local commands_source="$BASE_DIR/commands/agent-os"
+    if [[ -d "$commands_source" ]]; then
+        for file in "$commands_source"/*.md; do
+            [[ -f "$file" ]] && echo "  $(basename "$file")"
+        done
+    else
+        echo "  (commands directory not found)"
+    fi
+
+    echo ""
+    echo "Product guide that would be created:"
+    echo "  agent-os/product/README.md"
+    echo ""
+    echo "No files were changed."
+}
+
 # -----------------------------------------------------------------------------
 # Installation Functions
 # -----------------------------------------------------------------------------
@@ -197,6 +306,7 @@ create_project_structure() {
 
     ensure_dir "$PROJECT_DIR/agent-os"
     ensure_dir "$PROJECT_DIR/agent-os/standards"
+    ensure_dir "$PROJECT_DIR/agent-os/product"
 
     print_success "Created agent-os/ directory structure"
 }
@@ -345,10 +455,10 @@ create_index() {
     fi
 
     # Then handle files in subfolders
-    local folders=$(find "$standards_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+    local folders=$(find "$standards_dir" -mindepth 1 -maxdepth 1 -type d ! -name ".backups" 2>/dev/null | sort)
     for folder in $folders; do
         local folder_name=$(basename "$folder")
-        local md_files=$(find "$folder" -name "*.md" -type f 2>/dev/null | sort)
+        local md_files=$(find "$folder" -name "*.md" -type f ! -path "*/.backups/*" 2>/dev/null | sort)
 
         if [[ -n "$md_files" ]]; then
             echo "$folder_name:" >> "$temp_file"
@@ -410,6 +520,44 @@ install_commands() {
     fi
 }
 
+create_product_readme() {
+    echo ""
+    print_status "Creating product context guide..."
+
+    local product_readme="$PROJECT_DIR/agent-os/product/README.md"
+
+    if [[ -f "$product_readme" ]]; then
+        print_success "Product context guide already exists"
+        return
+    fi
+
+    cat > "$product_readme" << 'EOF'
+# Agent OS Product Context
+
+This folder stores durable project context for developers and agents.
+
+Recommended first-time workflow:
+
+1. `/understand-project` creates `project-brief.md`
+2. `/create-tech-stack` creates `tech-stack.md`
+3. `/discover-standards` creates project standards in `agent-os/standards/`
+4. `/plan-product` creates or updates `mission.md` and `roadmap.md`
+5. `/shape-spec` creates saved specs for meaningful implementation work
+6. `/spec-changelog` maintains `agent-os/specs/CHANGELOG.md`
+7. `/review-project` creates a project readiness review
+
+Expected files:
+
+- `project-brief.md` — how the project works and where to start
+- `mission.md` — product purpose, audience, and constraints
+- `roadmap.md` — high-level product direction
+- `tech-stack.md` — factual technologies and what each is used for
+- `project-review.md` — project health, risks, and recommended next actions
+EOF
+
+    print_success "Created agent-os/product/README.md"
+}
+
 # -----------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------
@@ -426,6 +574,11 @@ main() {
 
     # Load configuration
     load_configuration
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        dry_run_installation
+        exit 0
+    fi
 
     # Show configuration
     echo ""
@@ -452,6 +605,7 @@ main() {
     echo "$chain_display"
 
     echo "  Commands only: $COMMANDS_ONLY"
+    echo "  No standards overwrite: $NO_STANDARDS_OVERWRITE"
 
     # Confirm overwrite if standards folder exists
     confirm_standards_overwrite
@@ -460,17 +614,23 @@ main() {
 
     # Install
     create_project_structure
+    backup_existing_standards
     install_standards
     create_index
+    create_product_readme
     install_commands
 
     echo ""
     print_success "Agent OS installed successfully!"
     echo ""
     echo "Next steps:"
-    echo "  1. Run /create-tech-stack to extract the tech stack from your codebase"
-    echo "  2. Run /discover-standards to extract patterns from your codebase"
-    echo "  3. Run /inject-standards to inject standards into your context"
+    echo "  1. Run /understand-project to create a project brief"
+    echo "  2. Run /create-tech-stack to extract the factual tech stack"
+    echo "  3. Run /discover-standards to extract patterns from your codebase"
+    echo "  4. Run /plan-product if mission or roadmap docs are missing"
+    echo "  5. Run /shape-spec in plan mode for meaningful work"
+    echo "  6. Run /spec-changelog to maintain spec history"
+    echo "  7. Run /review-project to audit readiness and gaps"
     echo ""
 }
 

@@ -39,7 +39,7 @@ Compare the file scan with the existing index:
 For each new standard file that needs an index entry:
 
 1. Read the file to understand its content
-2. Use AskUserQuestion to propose a description:
+2. Use the available user-input/question tool, or one concise chat question, to propose a description:
 
 ```
 New standard needs indexing:
