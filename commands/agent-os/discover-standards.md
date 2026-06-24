@@ -5,10 +5,11 @@ Extract tribal knowledge from your codebase into concise, documented standards.
 ## Important Guidelines
 
 - **Use the available user-input/question tool** when one exists. If none exists, ask one concise question in chat.
-- **Write concise standards** — Use minimal words. Standards must be scannable by AI agents without bloating context windows.
-- **Offer suggestions** — Present options the user can confirm, choose between, or correct. Don't make them think harder than necessary.
-- **Execute OS-appropriate commands** — Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
-- **Read ONLY what you need** — Limit deep reads to 2-5 files per area. Do NOT load entire directories. Do NOT re-read files already in context.
+- **Write concise standards** - Use minimal words. Standards must be scannable by AI agents without bloating context windows.
+- **Offer suggestions** - Present options the user can confirm, choose between, or correct. Don't make them think harder than necessary.
+- **Execute OS-appropriate commands** - Dynamically translate standard Unix concepts (`tree`, `grep`, `cat`, `ls`) into the native commands of the user's current host operating system.
+- **Read ONLY what you need** - Limit deep reads to 2-5 files per area. Do NOT load entire directories. Do NOT re-read files already in context.
+- **Document project conventions, not generic framework defaults** - A standard should capture something repeated, local, opinionated, or risky enough that future agents need to know it.
 
 ## Process
 
@@ -28,12 +29,14 @@ If no area was specified:
 ```
 I've identified these areas in your codebase:
 
-1. **API Routes** (src/api/) — Request handling, response formats
-2. **Database** (src/models/, src/db/) — Models, queries, migrations
-3. **React Components** (src/components/) — UI patterns, props, state
-4. **Authentication** (src/auth/) — Login, sessions, permissions
+1. **API Routes** (src/api/) - Request handling, response formats
+2. **Database** (src/models/, src/db/) - Models, queries, migrations
+3. **React Components** (src/components/) - UI patterns, props, state
+4. **Authentication** (src/auth/) - Login, sessions, permissions
 
-Which area should we focus on for discovering standards? (Pick one, or suggest a different area)
+Which area should I inspect for project-specific conventions?
+
+Choose one number, or name a different area. Good standards usually come from code that repeats across several files.
 ```
 
 Wait for user response before proceeding.
@@ -46,28 +49,24 @@ Once an area is determined:
    a) **Skeleton Extraction:** Mandate fast terminal searches (e.g., `grep -r "class\|interface\|extends\|export\|return {" [selected_area] | head -n 50`) to identify macro-patterns. Dynamically translate standard Unix concepts (`grep`, `head`) into native commands of your host operating system.
    b) **Deep Reading:** Limit yourself to fully reading ONLY 2-5 specific files that clearly represent the patterns found in the grep/skeleton output.
 2. Look for patterns that are:
-   - **Unusual or unconventional** — Not standard framework/library patterns
-   - **Opinionated** — Specific choices that could have gone differently
-   - **Tribal** — Things a new developer wouldn't know without being told
-   - **Consistent** — Patterns repeated across multiple files
-   - **Not framework defaults** — Avoid documenting behavior that the framework already clearly dictates
-
+   - **Unusual or unconventional** - Not standard framework/library patterns
+   - **Opinionated** - Specific choices that could have gone differently
+   - **Tribal** - Things a new developer wouldn't know without being told
+   - **Consistent** - Patterns repeated across multiple files
+   - **Risk-reducing** - Patterns that prevent data loss, security bugs, regressions, or confusion
+   - **Not framework defaults** - Avoid documenting behavior that the framework already clearly dictates
 3. Use the available question tool or chat to present findings and let user select:
 
 ```
-I analyzed [area] and found these potential standards worth documenting:
+I analyzed [area] and found these repeated project-specific patterns:
 
-1. **API Response Envelope** — All responses use { success, data, error } structure
-2. **Error Codes** — Custom error codes like AUTH_001, DB_002 with specific meanings
-3. **Pagination Pattern** — Cursor-based pagination with consistent param names
+1. **API Response Envelope** - All responses use { success, data, error } - seen in src/api/users.ts, src/api/projects.ts
+2. **Error Codes** - Custom codes like AUTH_001 and DB_002 - seen in src/api/errors.ts, src/lib/errors.ts
+3. **Pagination Pattern** - Cursor pagination with `cursor` and `limit` params - seen in src/api/users.ts, src/api/audit-log.ts
 
-Which would you like to document?
+Which patterns should become standards?
 
-Options:
-- "Yes, all of them"
-- "Just 1 and 3"
-- "Add: [your suggestion]"
-- "Skip this area"
+Answer: all / numbers only / add: [pattern] / skip
 ```
 
 Wait for user selection before proceeding.
@@ -76,21 +75,39 @@ Wait for user selection before proceeding.
 
 **IMPORTANT:** For each selected standard, you MUST complete this full loop before moving to the next standard:
 
-1. **Confirm it is worth documenting:** "Is this a real project convention, or just a framework/default pattern?"
-2. **Wait for user response**
-3. **Ask what agents should always do:** "What should agents always do when this rule applies?"
-4. **Ask what agents should never do:** "What should agents never do here?"
-5. **Ask the exception question:** "When does this rule not apply?"
-6. **Draft the standard** with the rule, why, example, anti-patterns, and exceptions.
-7. **Confirm with user** before creating the file.
-8. **Create the file** if approved.
+1. **Confirm it is worth documenting:**
+   ```
+   For **[standard name]**, is this truly a project convention?
 
-Use this compact loop for each selected standard:
+   Answer: yes / no, framework default / not sure
+   ```
+2. **Wait for user response.** If the answer is "no, framework default", skip this standard.
+3. **Ask what agents should always do:**
+   ```
+   When this convention applies, what should an agent always do?
+   ```
+4. **Ask what agents should never do:**
+   ```
+   What mistakes should an agent avoid here?
+   ```
+5. **Ask for the strongest local example:**
+   ```
+   What is the strongest code example for this standard?
 
-- "Is this a real project convention or just framework default?"
-- "What should agents always do?"
-- "What should agents never do?"
-- "When does this rule not apply?"
+   Provide a file path, function, component, or flow if you know one. If not, say "use the examples you found".
+   ```
+6. **Ask the exception question:**
+   ```
+   When should this convention not apply, if ever?
+   ```
+7. **Draft the standard** with the rule, why, example, anti-patterns, and exceptions.
+8. **Confirm with user** before creating the file:
+   ```
+   Does this draft capture the rule correctly?
+
+   Answer: yes / edit: [changes] / skip
+   ```
+9. **Create the file** if approved.
 
 **Do NOT batch all questions upfront.** Process one standard at a time through the full loop.
 
@@ -101,7 +118,7 @@ For each standard (after completing Step 3's Q&A):
 1. Determine the appropriate folder (create if needed):
    - `api/`, `database/`, `javascript/`, `css/`, `backend/`, `testing/`, `global/`
 
-2. Check if a related standard file already exists — append to it if so
+2. Check if a related standard file already exists - append to it if so.
 
 3. Draft the content and use the available question tool or chat to confirm:
 
@@ -120,12 +137,14 @@ All API responses use this envelope:
 
 - **Rule:** Always return the response envelope.
 - **Why:** Frontend code checks one predictable shape.
-- **Example:** `{ "success": true, "data": { ... } }`
+- **Local example:** `src/api/users.ts`
 - **Anti-patterns:** Never return raw arrays or unwrapped objects.
 - **Exceptions:** None unless explicitly documented in this standard.
 ---
 
-Create this file? (yes / edit: [your changes] / skip)
+Does this draft capture the rule correctly?
+
+Answer: yes / edit: [changes] / skip
 ```
 
 4. Create or update the file in `agent-os/standards/[folder]/`
@@ -144,7 +163,9 @@ New standard needs an index entry:
 
 Suggested description: "API response envelope structure and error format"
 
-Accept this description? (yes / or type a better one)
+Accept this description?
+
+Answer: yes / edit: [better one-line description]
 ```
 
 3. Update `agent-os/standards/index.yml`:
@@ -166,7 +187,9 @@ Standards created for [area]:
 - api/response-format.md
 - api/error-codes.md
 
-Would you like to discover standards in another area, or are we done?
+Would you like to discover standards in another area?
+
+Answer: yes: [area] / no, done
 ```
 
 ## Output Location
@@ -178,25 +201,26 @@ Index file: `agent-os/standards/index.yml`
 
 Standards will be injected into AI context windows. Every word costs tokens. Follow these rules:
 
-- **Lead with the rule** — State what to do first, explain why second (if needed)
-- **Use code examples** — Show, don't tell
-- **Skip the obvious** — Don't document what the code already makes clear
-- **One standard per concept** — Don't combine unrelated patterns
-- **Bullet points over paragraphs** — Scannable beats readable
-- **Include the full decision** — Each standard should capture the rule, why it exists, examples, anti-patterns, and when it does not apply.
+- **Lead with the rule** - State what to do first, explain why second (if needed).
+- **Use code examples** - Show, don't tell.
+- **Skip the obvious** - Don't document what the code already makes clear.
+- **One standard per concept** - Don't combine unrelated patterns.
+- **Bullet points over paragraphs** - Scannable beats readable.
+- **Include the full decision** - Each standard should capture the rule, why it exists, examples, anti-patterns, and when it does not apply.
 
 **Good:**
 ```markdown
 # Error Responses
 
-Use error codes: `AUTH_001`, `DB_001`, `VAL_001`
+Use error codes: `AUTH_001`, `DB_001`, `VAL_001`.
 
 \`\`\`json
 { "success": false, "error": { "code": "AUTH_001", "message": "..." } }
 \`\`\`
 
-- Always include both code and message
-- Log full error server-side, return safe message to client
+- Always include both code and message.
+- Log full error server-side, return safe message to client.
+- Local example: `src/api/errors.ts`
 ```
 
 **Bad:**
@@ -214,72 +238,55 @@ Here's how to process a single standard through the complete workflow:
 **1. Present findings (Step 2):**
 ```
 I found these patterns in your API code:
-1. **Response Envelope** — All responses use { success, data, error }
-2. **Error Codes** — Custom codes like AUTH_001
+1. **Response Envelope** - All responses use { success, data, error } - seen in src/api/users.ts, src/api/projects.ts
+2. **Error Codes** - Custom codes like AUTH_001 - seen in src/api/errors.ts
 
-Which would you like to document?
+Which patterns should become standards?
+
+Answer: all / numbers only / add: [pattern] / skip
 ```
 
 User: "Both"
 
-**2. Ask why for first standard (Step 3):**
+**2. Confirm the first standard is real (Step 3):**
 ```
-For the Response Envelope pattern:
-- What problem does this solve? Why not return raw data?
-- Are there any endpoints that don't use this pattern?
-```
+For **Response Envelope**, is this truly a project convention?
 
-User: "We use it so the frontend always knows where to find the data. All endpoints use it, no exceptions."
-
-**3. Ask anti-pattern question (Step 3 continued):**
-```
-Are there common mistakes or anti-patterns developers (or AI agents) make with this?
-What should they NEVER do here?
-```
-
-User: "Never return raw arrays or unwrapped objects. Never omit the 'success' key even on success."
-
-**4. Draft first standard (Step 3 continued):**
-```
-Here's the draft for api/response-envelope.md:
-
----
-# Response Envelope
-
-All API responses use this structure:
-\`\`\`json
-{ "success": true, "data": { ... } }
-{ "success": false, "error": { ... } }
-\`\`\`
-
-- Frontend always checks `success` first, then reads `data` or `error`
-- No exceptions — every endpoint uses this format
-
-**Anti-patterns — NEVER do this:**
-- Do NOT return raw arrays or unwrapped objects
-- Do NOT omit the `success` key even on successful responses
----
-
-Create this file?
+Answer: yes / no, framework default / not sure
 ```
 
 User: "Yes"
 
-**5. Create file, then move to next standard:**
-
-[Create the file]
-
-**6. Ask why for second standard (back to Step 3):**
+**3. Ask what agents should always do:**
 ```
-For the Error Codes pattern:
-- What's the naming convention for codes?
-- Where should new error codes be documented?
+When this convention applies, what should an agent always do?
 ```
 
-User: "Format is AREA_NUMBER like AUTH_001. We keep a list in the wiki."
+User: "Always return success plus data or error, so frontend code can read one predictable shape."
 
-**7. Ask anti-pattern question, draft, confirm, create file...**
+**4. Ask anti-pattern question:**
+```
+What mistakes should an agent avoid here?
+```
 
-[Continue until all selected standards are done]
+User: "Never return raw arrays or unwrapped objects. Never omit the success key."
 
-**Key point:** Complete the full ask → anti-pattern → draft → confirm → create cycle for each standard before starting the next one.
+**5. Ask for the strongest local example:**
+```
+What is the strongest code example for this standard?
+
+Provide a file path, function, component, or flow if you know one. If not, say "use the examples you found".
+```
+
+User: "Use src/api/users.ts."
+
+**6. Ask exception question:**
+```
+When should this convention not apply, if ever?
+```
+
+User: "No exceptions."
+
+**7. Draft, confirm, create file, then move to the next standard.**
+
+**Key point:** Complete the full ask -> draft -> confirm -> create cycle for each standard before starting the next one.

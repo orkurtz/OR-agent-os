@@ -5,12 +5,13 @@ Gather context and structure planning for significant work. **Run this command w
 ## Important Guidelines
 
 - **Use the available user-input/question tool** when one exists. If none exists, ask one concise question in chat.
-- **Offer suggestions** — Present options the user can confirm, adjust, or correct
-- **Keep it lightweight** — This is shaping, not exhaustive documentation
+- **Offer suggestions** - Present options the user can confirm, adjust, or correct.
+- **Keep it lightweight** - This is shaping, not exhaustive documentation.
 - **This command ONLY creates the plan. It does NOT implement anything.** Implementation begins only after the user approves the plan and exits plan mode.
-- **One question at a time** — NEVER ask more than one question per message. NEVER proceed before receiving the user's answer.
-- **State is on disk, not in memory** — The executing agent must always re-read `plan.md` before updating markers. Never assume task status from conversation history.
-- **Use balanced execution discipline** — Significant implementation tasks get state markers, recovery rules, Ponytail YAGNI, and verification. Documentation-only tasks and tiny quick edits should stay lightweight.
+- **One question at a time** - NEVER ask more than one question per message. NEVER proceed before receiving the user's answer.
+- **State is on disk, not in memory** - The executing agent must always re-read `plan.md` before updating markers. Never assume task status from conversation history.
+- **Use balanced execution discipline** - Significant implementation tasks get state markers, recovery rules, Ponytail YAGNI, and verification. Documentation-only tasks and tiny quick edits should stay lightweight.
+- **Ask implementation-shaping questions** - Every answer should improve scope, references, standards, risks, or the final execution plan.
 
 ## Prerequisites
 
@@ -33,28 +34,26 @@ Do not proceed with any steps below until confirmed to be in plan mode.
 Use the available question tool or chat to understand the scope:
 
 ```
-What are we building? Please describe the feature or change.
+What feature or change are we planning?
 
-(Be as specific as you like — I'll ask follow-up questions if needed)
+Describe the desired outcome, who it affects, and what must be true when it is done.
 ```
 
 Based on their response, ask 1-2 clarifying questions if the scope is unclear. Examples:
-- "Is this a new feature or a change to existing functionality?"
-- "What's the expected outcome when this is done?"
-- "Are there any constraints or requirements I should know about?"
+- "Is this new behavior, a change to existing behavior, or a fix?"
+- "What should users or operators be able to do when this is done?"
+- "What constraints, edge cases, or risks should shape the plan?"
 
 ### Step 2: Gather Visuals
 
 Use the available question tool or chat:
 
 ```
-Do you have any visuals to reference?
+Are there visuals I should use as references?
 
-- Mockups or wireframes
-- Screenshots of similar features
-- Examples from other apps
+Examples: mockups, wireframes, screenshots, sketches, or comparable screens from another app.
 
-(Paste images, share file paths, or say "none")
+Share file paths, paste images, or say "none".
 ```
 
 If visuals are provided, note them for inclusion in the spec folder.
@@ -64,14 +63,9 @@ If visuals are provided, note them for inclusion in the spec folder.
 Use the available question tool or chat:
 
 ```
-Is there similar code in this codebase I should reference?
+Is there existing code I should study before planning this?
 
-Examples:
-- "The comments feature is similar to what we're building"
-- "Look at how src/features/notifications/ handles real-time updates"
-- "No existing references"
-
-(Point me to files, folders, or features to study)
+Point me to similar files, folders, flows, or features. If nothing applies, say "no existing references".
 ```
 
 If references are provided, read and analyze them to inform the plan.
@@ -80,7 +74,7 @@ If references are provided, read and analyze them to inform the plan.
 
 Check if `agent-os/product/` exists and contains files.
 
-If it exists, read key files (like `project-brief.md`, `mission.md`, `roadmap.md`, `tech-stack.md`) and surface SPECIFIC alignment points or conflicts — don't just ask if alignment is needed. Use the available question tool or chat:
+If it exists, read key files (like `project-brief.md`, `mission.md`, `roadmap.md`, `tech-stack.md`) and surface SPECIFIC alignment points or conflicts. Do not just ask if alignment is needed. Use the available question tool or chat:
 
 ```
 I found product context in agent-os/product/:
@@ -89,7 +83,9 @@ I found product context in agent-os/product/:
 - Roadmap includes: [list any roadmap items that relate to this feature]
 - Tech stack: [note any tech constraints relevant to this feature]
 
-Does this feature affect or conflict with any of these? (yes — describe / no / not sure)
+Does this feature affect or conflict with any product context above?
+
+Answer: no / not sure / yes: [describe the effect or conflict]
 ```
 
 If no product folder exists, skip this step.
@@ -104,10 +100,12 @@ Use the available question tool or chat to confirm:
 Based on what we're building, these standards may apply:
 
 [List ONLY standards actually found in index.yml that are relevant to this feature.
-Format each as: N. **folder/name** — [description from index.yml]
+Format each as: N. **folder/name** - [description from index.yml]
 If no standards in the index are relevant, say so and skip this step.]
 
-Should I include these in the spec? (yes / adjust: remove N, add folder/name)
+Which standards should I include in the spec?
+
+Answer: all suggested / none / adjust: remove N, add folder/name
 ```
 
 Read the confirmed standards files to include their content in the plan context.
@@ -140,17 +138,17 @@ Here's the plan structure. Task 1 saves all our shaping work before implementati
 
 # Plan: [Feature Name]
 
-## ⚡ Session Start Protocol (Read This First)
+## Session Start Protocol (Read This First)
 Before doing ANY work in this session:
-1. Read `standards.md` in this spec folder — all rules there are mandatory for every task
-2. Scan this file for any `[/] In Progress` tasks → apply RECOVERY RULE below
+1. Read `standards.md` in this spec folder - all rules there are mandatory for every task
+2. Scan this file for any `[/] In Progress` tasks -> apply RECOVERY RULE below
 3. Read `agent-os/specs/CHANGELOG.md` if it exists to understand recent project history
-4. Do NOT begin any implementation until steps 1–3 are complete
+4. Do NOT begin any implementation until steps 1-3 are complete
 
 ## State Tracking & Execution Rules
 Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
-- `[/] In Progress` — update to this BEFORE writing any code
+- `[/] In Progress` - update to this BEFORE writing any code
 - `[x] Completed: [comma-separated modified files]`
 
 **PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, stop at the first rung that holds:
@@ -160,41 +158,41 @@ Future agents MUST strictly update this file during execution.
   4. Does an already-installed dependency solve it? Use it. Never add a new one for what a few lines can do.
   5. Can it be one line? Make it one line.
   6. Only then: write the minimum code that works.
-  Mark deliberate simplifications with a `ponytail:` comment — if the shortcut has a known ceiling, name it and the upgrade path.
+  Mark deliberate simplifications with a `ponytail:` comment - if the shortcut has a known ceiling, name it and the upgrade path.
   NEVER simplify away: input validation, error handling that prevents data loss, security, or accessibility.
   Output: code first, then at most three short lines on what was skipped and when to add it.
 
 **VERIFICATION GATE:** Before changing any implementation task to `[x]`, you MUST:
   1. Read the project manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) to find the defined lint/check/typecheck script.
   2. Run ONLY scripts explicitly defined in that manifest. NEVER invent commands.
-  3. If no lint script exists → run a syntax-only check (e.g., `node --check file.js` or `python -m py_compile file.py`). Use OS-appropriate commands.
-  4. If no manifest exists → skip and note: "No manifest detected — manual review advised."
+  3. If no lint script exists -> run a syntax-only check (e.g., `node --check file.js` or `python -m py_compile file.py`). Use OS-appropriate commands.
+  4. If no manifest exists -> skip and note: "No manifest detected - manual review advised."
   5. Scan output for: "error", "Error", "FAILED", "Cannot find". Exit code 0 with zero errors required. Warnings are acceptable but must be noted.
-  6. If errors exist → remain in `[/]` and fix. Mark `[x]` ONLY upon a clean result.
-  Documentation-only tasks may record "Documentation-only task — verification not required."
+  6. If errors exist -> remain in `[/]` and fix. Mark `[x]` ONLY upon a clean result.
+  Documentation-only tasks may record "Documentation-only task - verification not required."
 
 **RECOVERY RULE:** If you find a `[/] In Progress` item at session start, re-read the files from the previous `[x]` completed entries, verify the partial work, then decide: resume or reset to `[ ]`.
 
 **POST-TASK MANDATE:** After completing each task, you MUST:
 1. Use a file-edit tool to write the updated marker directly into `plan.md` on disk.
-   - First re-read `plan.md` to get current content — never rely on conversation memory.
-   - Change `[/] In Progress` → `[x] Completed: [comma-separated modified files]`
+   - First re-read `plan.md` to get current content - never rely on conversation memory.
+   - Change `[/] In Progress` -> `[x] Completed: [comma-separated modified files]`
 2. Record the Verification Gate result inline in the `[x]` entry.
 3. Refresh `agent-os/specs/CHANGELOG.md` with /spec-changelog after completing or materially updating spec work.
 
-Never mark a task complete only in conversation — the mutation MUST be written to disk.
+Never mark a task complete only in conversation - the mutation MUST be written to disk.
 Do NOT rewrite task text. Only mutate the state markers.
 
 ## Task 1: Save Spec Documentation
 
 Create `agent-os/specs/{folder-name}/` with:
 
-- [ ] **plan.md** — This full plan
-- [ ] **shape.md** — Shaping notes (scope, decisions, context from our conversation)
-- [ ] **standards.md** — Relevant standards that apply to this work
-- [ ] **references.md** — Pointers to reference implementations studied
-- [ ] **visuals/** — Any mockups or screenshots provided (skip if none)
-- [ ] **Update `agent-os/specs/CHANGELOG.md`** — Run /spec-changelog after saving this spec
+- [ ] **plan.md** - This full plan
+- [ ] **shape.md** - Shaping notes (scope, decisions, context from our conversation)
+- [ ] **standards.md** - Relevant standards that apply to this work
+- [ ] **references.md** - Pointers to reference implementations studied
+- [ ] **visuals/** - Any mockups or screenshots provided (skip if none)
+- [ ] **Update `agent-os/specs/CHANGELOG.md`** - Run /spec-changelog after saving this spec
 
 ## Task 2: [First implementation task]
 
@@ -206,7 +204,9 @@ Create `agent-os/specs/{folder-name}/` with:
 
 ---
 
-Does this plan structure look right? I'll fill in the implementation tasks next.
+Does this plan structure look right before I fill in the implementation tasks?
+
+Answer: yes / adjust: [what to change]
 ```
 
 ### Step 8: Complete the Plan
@@ -232,9 +232,11 @@ Plan complete. When you approve and execute:
 IMPORTANT: This plan was created in plan mode. To implement it:
 - Exit plan mode
 - Approve this plan
-- The executing agent must re-read plan.md before starting — never assume task status from this conversation
+- The executing agent must re-read plan.md before starting - never assume task status from this conversation
 
-Ready to start? (approve / adjust)
+Ready to approve this plan for execution?
+
+Answer: approve / adjust: [what to change]
 ```
 
 ## Output Structure
@@ -243,11 +245,11 @@ The spec folder will contain:
 
 ```
 agent-os/specs/{YYYY-MM-DD-HHMM-feature-slug}/
-├── plan.md           # The full plan
-├── shape.md          # Shaping decisions and context
-├── standards.md      # Which standards apply and key points
-├── references.md     # Pointers to similar code
-└── visuals/          # Mockups, screenshots (if any)
+|-- plan.md           # The full plan
+|-- shape.md          # Shaping decisions and context
+|-- standards.md      # Which standards apply and key points
+|-- references.md     # Pointers to similar code
+`-- visuals/          # Mockups, screenshots (if any)
 ```
 
 The project spec history will be maintained in:
@@ -261,16 +263,16 @@ agent-os/specs/CHANGELOG.md
 The shape.md file should capture:
 
 ```markdown
-# {Feature Name} — Shaping Notes
+# {Feature Name} - Shaping Notes
 
 ## Scope
 
-[What we're building, from Step 1]
+[Desired outcome, affected users/operators, and done condition from Step 1]
 
 ## Decisions
 
 - [Key decisions made during shaping]
-- [Constraints or requirements noted]
+- [Constraints, edge cases, or risks noted]
 
 ## Context
 
@@ -280,8 +282,8 @@ The shape.md file should capture:
 
 ## Standards Applied
 
-- api/response-format — [why it applies]
-- api/error-handling — [why it applies]
+- api/response-format - [why it applies]
+- api/error-handling - [why it applies]
 ```
 
 ## standards.md Content
@@ -326,7 +328,7 @@ The following standards apply to this work.
 
 ## Tips
 
-- **Keep shaping fast** — Don't over-document. Capture enough to start, refine as you build.
-- **Visuals are optional** — Not every feature needs mockups.
-- **Standards guide, not dictate** — They inform the plan but aren't always mandatory.
-- **Specs are discoverable** — Months later, someone can find this spec and understand what was built and why.
+- **Keep shaping fast** - Don't over-document. Capture enough to start, refine as you build.
+- **Visuals are optional** - Not every feature needs mockups.
+- **Standards guide, not dictate** - They inform the plan but aren't always mandatory.
+- **Specs are discoverable** - Months later, someone can find this spec and understand what was built and why.
