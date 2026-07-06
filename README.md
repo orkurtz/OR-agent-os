@@ -62,9 +62,10 @@ Use this flow when installing Agent OS into a project for the first time, especi
 3. Run `/create-tech-stack` so the stack is documented from real manifests instead of guesses.
 4. Run `/discover-standards` for one important area at a time, such as API routes, UI components, database, testing, or auth.
 5. Run `/plan-product` if mission and roadmap docs are missing or stale.
-6. Use `/shape-spec` before building a meaningful feature or risky change.
-7. Run `/spec-changelog` after specs are created or updated so project history stays readable.
-8. Run `/review-project` when you want a health check and a prioritized list of gaps.
+6. Use `/continue-roadmap` to transition the next roadmap phase into a shaped spec.
+7. Use `/shape-spec` before building a meaningful feature or risky change.
+8. Run `/spec-changelog` after specs are created or updated so project history stays readable.
+9. Run `/review-project` when you want a health check and a prioritized list of gaps.
 
 For a brand-new project, start with `/plan-product` after `/understand-project` if there is not much code yet. For an existing project, start with `/understand-project`, then `/discover-standards`.
 
@@ -121,9 +122,10 @@ Agents should keep changes minimal, follow the Ponytail/YAGNI standard, avoid in
 2. `/create-tech-stack` - document the factual stack from manifests.
 3. `/discover-standards` - extract real conventions from the codebase.
 4. `/plan-product` - create or update mission and roadmap.
-5. `/shape-spec` - plan meaningful work in plan mode.
-6. `/spec-changelog` - maintain the project history from specs.
-7. `/review-project` - audit readiness, risks, and gaps.
+5. `/continue-roadmap` - transition the next roadmap phase into a shaped spec.
+6. `/shape-spec` - plan meaningful work in plan mode.
+7. `/spec-changelog` - maintain the project history from specs.
+8. `/review-project` - audit readiness, risks, and gaps.
 
 ## Commands
 
@@ -133,6 +135,7 @@ Agents should keep changes minimal, follow the Ponytail/YAGNI standard, avoid in
 - `/index-standards`: Use after manually adding/removing standards. Maintains `agent-os/standards/index.yml`.
 - `/inject-standards`: Use before quick implementation. Loads relevant standards into the current context.
 - `/plan-product`: Use when product mission or roadmap is missing/stale. Creates or updates `mission.md` and `roadmap.md`.
+- `/continue-roadmap`: Use when you want to proceed with the next phase of the product roadmap.
 - `/shape-spec`: Use before meaningful, multi-step, or risky work. Creates persistent specs for implementation.
 - `/spec-changelog`: Use after specs are created or completed. Creates or updates `agent-os/specs/CHANGELOG.md`.
 - `/review-project`: Use for audits, onboarding readiness, and gap finding. Creates `agent-os/product/project-review.md`.

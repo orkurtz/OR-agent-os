@@ -542,9 +542,10 @@ Recommended first-time workflow:
 2. `/create-tech-stack` creates `tech-stack.md`
 3. `/discover-standards` creates project standards in `agent-os/standards/`
 4. `/plan-product` creates or updates `mission.md` and `roadmap.md`
-5. `/shape-spec` creates saved specs for meaningful implementation work
-6. `/spec-changelog` maintains `agent-os/specs/CHANGELOG.md`
-7. `/review-project` creates a project readiness review
+5. `/continue-roadmap` transitions the next roadmap phase into a shaped spec
+6. `/shape-spec` creates saved specs for meaningful implementation work
+7. `/spec-changelog` maintains `agent-os/specs/CHANGELOG.md`
+8. `/review-project` creates a project readiness review
 
 Expected files:
 
@@ -628,9 +629,10 @@ main() {
     echo "  2. Run /create-tech-stack to extract the factual tech stack"
     echo "  3. Run /discover-standards to extract patterns from your codebase"
     echo "  4. Run /plan-product if mission or roadmap docs are missing"
-    echo "  5. Run /shape-spec in plan mode for meaningful work"
-    echo "  6. Run /spec-changelog to maintain spec history"
-    echo "  7. Run /review-project to audit readiness and gaps"
+    echo "  5. Run /continue-roadmap to transition the next roadmap phase into a spec"
+    echo "  6. Run /shape-spec in plan mode for meaningful work"
+    echo "  7. Run /spec-changelog to maintain spec history"
+    echo "  8. Run /review-project to audit readiness and gaps"
     echo ""
 }
 

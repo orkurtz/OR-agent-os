@@ -148,8 +148,8 @@ Before doing ANY work in this session:
 ## State Tracking & Execution Rules
 Future agents MUST strictly update this file during execution.
 - `[ ]` Pending
-- `[/] In Progress` - update to this BEFORE writing any code
-- `[x] Completed: [comma-separated modified files]`
+- `[/]` [Original Task Text] (In Progress) - update to this BEFORE writing any code
+- `[x]` [Original Task Text] (Completed: [comma-separated modified files])
 
 **PONYTAIL RULE (YAGNI & MINIMIZATION):** Before writing any new code or creating new files, stop at the first rung that holds:
   1. Does this need to exist at all? Speculative need = skip it. (YAGNI)
@@ -176,7 +176,9 @@ Future agents MUST strictly update this file during execution.
 **POST-TASK MANDATE:** After completing each task, you MUST:
 1. Use a file-edit tool to write the updated marker directly into `plan.md` on disk.
    - First re-read `plan.md` to get current content - never rely on conversation memory.
-   - Change `[/] In Progress` -> `[x] Completed: [comma-separated modified files]`
+   - Do NOT delete or rewrite the original task text.
+   - Change `[ ]` to `[/]` and append `(In Progress)`.
+   - Change `[/]` to `[x]` and replace `(In Progress)` with `(Completed: [comma-separated modified files])`.
 2. Record the Verification Gate result inline in the `[x]` entry.
 3. Refresh `agent-os/specs/CHANGELOG.md` with /spec-changelog after completing or materially updating spec work.
 

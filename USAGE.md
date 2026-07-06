@@ -35,9 +35,10 @@ The installer creates:
 2. `/create-tech-stack` — document the factual stack from manifests
 3. `/discover-standards` — capture conventions from real code
 4. `/plan-product` — create or update mission and roadmap
-5. `/shape-spec` — plan meaningful feature work
-6. `/spec-changelog` — maintain `agent-os/specs/CHANGELOG.md`
-7. `/review-project` — audit project readiness and improvement gaps
+5. `/continue-roadmap` — transition the next roadmap phase into a shaped spec
+6. `/shape-spec` — plan meaningful feature work
+7. `/spec-changelog` — maintain `agent-os/specs/CHANGELOG.md`
+8. `/review-project` — audit project readiness and improvement gaps
 
 ## Using Other Agents
 

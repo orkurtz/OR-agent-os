@@ -361,9 +361,10 @@ function Create-ProductReadme {
         '2. `/create-tech-stack` creates `tech-stack.md`',
         '3. `/discover-standards` creates project standards in `agent-os/standards/`',
         '4. `/plan-product` creates or updates `mission.md` and `roadmap.md`',
-        '5. `/shape-spec` creates saved specs for meaningful implementation work',
-        '6. `/spec-changelog` maintains `agent-os/specs/CHANGELOG.md`',
-        '7. `/review-project` creates a project readiness review',
+        '5. `/continue-roadmap` transitions the next roadmap phase into a shaped spec',
+        '6. `/shape-spec` creates saved specs for meaningful implementation work',
+        '7. `/spec-changelog` maintains `agent-os/specs/CHANGELOG.md`',
+        '8. `/review-project` creates a project readiness review',
         "",
         "Expected files:",
         "",
@@ -448,6 +449,7 @@ Write-Host "  1. Run /understand-project to create a project brief"
 Write-Host "  2. Run /create-tech-stack to extract the factual tech stack"
 Write-Host "  3. Run /discover-standards to extract patterns from your codebase"
 Write-Host "  4. Run /plan-product if mission or roadmap docs are missing"
-Write-Host "  5. Run /shape-spec in plan mode for meaningful work"
-Write-Host "  6. Run /spec-changelog to maintain spec history"
-Write-Host "  7. Run /review-project to audit readiness and gaps"
+Write-Host "  5. Run /continue-roadmap to transition the next roadmap phase into a spec"
+Write-Host "  6. Run /shape-spec in plan mode for meaningful work"
+Write-Host "  7. Run /spec-changelog to maintain spec history"
+Write-Host "  8. Run /review-project to audit readiness and gaps"

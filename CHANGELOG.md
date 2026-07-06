@@ -12,6 +12,7 @@ https://buildermethods.com/agent-os
 - Added "State is on disk, not in memory" rule to `plan-product.md` and `shape-spec.md` — agents must always re-read the file, never infer task status from conversation history.
 - Added **POST-TASK CHECKLIST** to `shape-spec.md` plan template — executing agents must output a checklist after each task confirming state update, file list, and Verification Gate result.
 - Added explicit **planner-executor separation** to `shape-spec.md` — the command creates plans ONLY; implementation begins only after user approval and exit from plan mode.
+- Fixed `shape-spec.md` state tracking instructions to prevent agents from overwriting the original task description when updating completion status.
 
 ### Verification Gate — Hardened
 - Replaced vague "dynamically infer" Verification Gate with a deterministic manifest-reading decision tree across `plan-product.md` and `shape-spec.md`:
@@ -23,6 +24,9 @@ https://buildermethods.com/agent-os
 
 ### Recovery Design
 - Added **RECOVERY RULE** to roadmap and plan templates: when a `[/] In Progress` item is found at session start, the agent must re-read previous completed files, verify partial work, and decide to resume or reset.
+
+### Roadmap & Planning
+- Added new `/continue-roadmap` command to seamlessly transition the next pending roadmap phase into a shaped spec using `/shape-spec`.
 
 ### Question Design
 - Rewrote `plan-product.md` NEW path questions to eliminate overlap (removed "idea" + "solution" duplication) and add launch-criteria clarity.
