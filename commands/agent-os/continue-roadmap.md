@@ -58,8 +58,9 @@ Treat the description of the uncompleted item as the user's answer to `/shape-sp
 
 **Proceed immediately with `/shape-spec` Step 2 (Gather Visuals) and follow the rest of the `/shape-spec` flow to create the plan.** You do not need to ask the user what we are building, as the roadmap item provides that context.
 
-### Step 4: Inject Roadmap Completion Task
+### Step 4: Inject Spec & Roadmap Completion Task
 
-While building the plan structure during `/shape-spec` (Step 7), you MUST ensure the final implementation task in the plan is to update the roadmap:
+While building the plan structure during `/shape-spec` (Step 7), you MUST ensure the final implementation task in the plan is to update both the spec's `plan.md` and the roadmap:
 
-`Task: Update agent-os/product/roadmap.md to mark this phase as completed (e.g. change [ ] to [x]) and summarize the files changed or what was built, just like we do in shape-spec.`
+`Task: Update the spec's plan.md (marking this final task as completed) and agent-os/product/roadmap.md to mark this phase as completed (e.g. change [ ] to [x]) and summarize the files changed or what was built, just like we do in shape-spec.`
+
